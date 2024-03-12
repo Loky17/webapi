@@ -1,0 +1,57 @@
+﻿@page "/"
+@using RiotSharp
+@using RiotSharp.Misc
+@using RiotSharp.Endpoints.Interfaces;
+@using RiotSharp.Endpoints.SummonerEndpoint;
+@using System.Net
+@inject IVersionProvider VersionProvider
+@inject LOLService Service;
+
+<Field>
+    <TextEdit>inserisci il tuo summoner name</TextEdit>
+</Field>
+
+<Field ColumnSize="ColumnSize.Is1">
+    <Select TValue="Region" @bind-SelectedValue="@region">
+        @foreach (var enumValue in Enum.GetValues<Region>())
+        {
+            <SelectItem @key="enumValue" Value="@enumValue">@enumValue</SelectItem>
+        }
+    </Select>
+</Field>
+<Button Clicked="LogIn">
+    I Tuoi Dati
+</Button>
+
+
+@code
+{
+    string username;
+    Region region;
+
+    protected override async Task OnInitializedAsync()
+    {
+    }
+    async Task LogIn()
+    {
+        try
+        {
+            var Api = RiotApi.GetDevelopmentInstance("RGAPI-ceff51a4-5da4-4983-85ee-288281598c61");
+            Service.GetSummonerAsync(username, region);
+        }
+        catch (RiotSharp.RiotSharpException ex)
+        {
+            if (ex.HttpStatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                // Handle the case where the summoner was not found
+                Console.WriteLine("Summoner not found.");
+            }
+            else
+            {
+                // Handle other errors
+                Console.WriteLine("Error: " + ex.Message);
+            }
+        }
+    }
+
+}
